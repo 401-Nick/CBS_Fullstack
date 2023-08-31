@@ -1,9 +1,7 @@
-body {
-  background-color: #1C1C1C;
-}/*
+/* I don't 100% understand the layout/system I'm supposed to use for doing CSS. This might not be best practice */
 
-#userLoginForm {
-  padding: 15px;
+.userForm {
+  padding: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,7 +11,7 @@ body {
   width: 100%;
   margin: auto;
 }
-#userLoginForm .validation {
+.userForm .validation {
   color: red;
   margin: 0;
   font-size: 10px;
@@ -36,33 +34,33 @@ body {
   padding: 5px;
   border-radius: 5px;
 }
-#userLoginForm input {
+.userForm input {
   transition: background-color 0.5s;
   margin: 5px;  
   padding: 5px;
-  border-radius: 5px;
-  border: 1px solid black;
+  /* border-radius: 5px; */
+  border: none;
   background-color: #1C1C1C;
   color: white;
   text-align: center;
   width: 100%;  
   max-width: 300px;
 }
-#userLoginForm input:hover {
+.userForm input:hover {
   background-color: white;
   color: black;
 }
-#userLoginForm label{
+.userForm label{
   margin-top: 10px;
   align-self: flex-start;
 }
-#userLoginForm a {
+.userForm a {
   align-self: flex-start;
   font-size: 10px;
   color: black;
   text-decoration: underline;
 }
-#userLoginForm .rememberMeField {
+.userForm .rememberMeField {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -70,4 +68,4 @@ body {
   white-space: nowrap;
   align-items: center;
   font-size: 10px;
-} */
+}
