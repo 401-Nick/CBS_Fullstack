@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Router from 'next/router';
+
 import InputField from '../../components/InputField';
 
 import { validate } from '../../utils/validate';
@@ -31,15 +33,15 @@ type ErrorsType = {
 };
 
 const formFields = [
-    { label: "First Name", type: "text", id: "firstName", name: "firstName", placeholder: "John" },
-    { label: "Last Name", type: "text", id: "lastName", name: "lastName", placeholder: "Doe" },
-    { label: "Date of Birth", type: "date", id: "dob", name: "dob", placeholder: "MM-DD-YYYY" },
-    { label: "Social Security Number", type: "text", id: "ssn", name: "ssn", placeholder: "000-00-0000" },
-    { label: "Password", type: "password", id: "password", name: "password", placeholder: "Password" },
-    { label: "Confirm Password", type: "password", id: "confirmPassword", name: "confirmPassword", placeholder: "Password" },
-    { label: "Email Address", type: "text", id: "emailAddress", name: "emailAddress", placeholder: "" },
-    { label: "Mobile Number", type: "text", id: "mobileNumber", name: "mobileNumber", placeholder: "000-000-0000" },
-    { label: "Physical Address", type: "text", id: "physicalAddress", name: "physicalAddress", placeholder: "1234 Main St" },
+    { label: "First Name",              type: "text",     id: "firstName",       name: "firstName",       placeholder: "John"           },
+    { label: "Last Name",               type: "text",     id: "lastName",        name: "lastName",        placeholder: "Doe"            },
+    { label: "Date of Birth",           type: "date",     id: "dob",             name: "dob",             placeholder: "MM-DD-YYYY"     },
+    { label: "Social Security Number",  type: "text",     id: "ssn",             name: "ssn",             placeholder: "000-00-0000"    },
+    { label: "Password",                type: "password", id: "password",        name: "password",        placeholder: "Password"       },
+    { label: "Confirm Password",        type: "password", id: "confirmPassword", name: "confirmPassword", placeholder: "Password"       },
+    { label: "Email Address",           type: "text",     id: "emailAddress",    name: "emailAddress",    placeholder: "email@email.com"},
+    { label: "Mobile Number",           type: "text",     id: "mobileNumber",    name: "mobileNumber",    placeholder: "000-000-0000"   },
+    { label: "Physical Address",        type: "text",     id: "physicalAddress", name: "physicalAddress", placeholder: "1234 Main St"   },
 ]
 
 export default function Register() {
@@ -54,17 +56,13 @@ export default function Register() {
         mobileNumber: '',
         physicalAddress: '',
     });
-
-
     const [submitError, setSubmitError] = useState<string | null>(null);
-
     const [errors, setErrors] = useState<ErrorsType>({});
-
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
-
     const registerUser = async (e: React.FormEvent) => {
         e.preventDefault();
         const formErrors = validate(formData);
@@ -77,11 +75,12 @@ export default function Register() {
 
         try {
             const apiResponse: any = await registerUserAPI(formData); // Use the API function to register the user
-            
+
             if (!apiResponse.success) {
                 setSubmitError(apiResponse?.message);
             } else {
                 console.log("Redirect!");
+                Router.push('/')
             }
         } catch (error) {
             console.error(`Registration failed: ${error}`);

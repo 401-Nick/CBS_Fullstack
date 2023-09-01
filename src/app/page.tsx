@@ -1,14 +1,13 @@
-import Image from "next/image"
 import LoginModule from "../../components/LoginModule"
-
+import Link from 'next/link';
 
 export default function Home() {
-
-
   
   return (
     <main className="main">
-      <LoginModule />
+      <p>go to /login or /register</p>
+      <Link href="/login">Login</Link>
+      <Link href="/register">Register</Link>
     </main>
   )
 }
