@@ -26,10 +26,10 @@ export const registerUserAPI = async (formData: UserFormData): Promise<ApiRespon
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            const errorResponse: ApiResponse = { success: false, message: "There was a problem! Registration unsuccessful. Try again later." };
+            return errorResponse;
         }
 
-        // If the response is successful, parse the JSON and return.
         const data: ApiResponse = await response.json();
         return data;
     } catch (error) {

@@ -55,6 +55,9 @@ export default function Register() {
         physicalAddress: '',
     });
 
+
+    const [submitError, setSubmitError] = useState<string | null>(null);
+
     const [errors, setErrors] = useState<ErrorsType>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,16 +69,19 @@ export default function Register() {
         e.preventDefault();
         const formErrors = validate(formData);
 
-        //If the array of formErrors is not empty, populate it with the errors.
+        // If there are errors, set the state to display errors and return.
+        setErrors(formErrors); // setErrors() must be outside if statement to clear errors when they are fixed or else persistent errors even after correction.
         if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
             return;
         }
 
         try {
-            const apiResponse = await registerUserAPI(formData);  // Use the API function to register the user
-            if (apiResponse) {
-                console.log(apiResponse.message);
+            const apiResponse: any = await registerUserAPI(formData); // Use the API function to register the user
+            
+            if (!apiResponse.success) {
+                setSubmitError(apiResponse?.message);
+            } else {
+                console.log("Redirect!");
             }
         } catch (error) {
             console.error(`Registration failed: ${error}`);
@@ -98,6 +104,7 @@ export default function Register() {
                     error={errors[field.name as keyof ErrorsType]}
                 />
                 ))}
+                <span className={styles.validation}>{submitError}</span>
                 <button type="submit" className={styles.loginFormButtons} id="userLoginButton" onClick={registerUser}>Register</button>
             </form>
         </div>
