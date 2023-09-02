@@ -1,4 +1,10 @@
-/* I don't 100% understand the layout/system I'm supposed to use for doing CSS. This might not be best practice */
+/* html{
+  background-color: #1C1C1C;
+} */
+
+/* body{
+  background-color: #1C1C1C;
+} */
 
 .userForm {
   padding: 5px;

@@ -25,7 +25,7 @@ const InputField: React.FC<InputFieldProps> = ({
     error}) => {
     
     return (
-        <div>
+        <div className={styles.buttonContainer}>
             <label htmlFor={id}>{label}</label>
             <input
                 type={type}

@@ -8,6 +8,8 @@ import { registerUserAPI } from '../../utils/apiService';
 
 import styles from '../../styles/register.module.css';
 
+import Layout from "../app/layout"
+
 type UserFormData = {
     firstName: string;
     lastName: string;
@@ -63,6 +65,7 @@ export default function Register() {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
     const registerUser = async (e: React.FormEvent) => {
         e.preventDefault();
         const formErrors = validate(formData);
@@ -87,25 +90,28 @@ export default function Register() {
         }
     };
     return (
-        <div>
-            <form className={styles.userForm} onSubmit={registerUser}>
-                <h1>Personal and Account Information</h1>
-                {formFields.map(field => (
-                <InputField 
-                    key={field.id}
-                    label={field.label}
-                    type={field.type}
-                    id={field.id}
-                    name={field.name}
-                    placeholder={field.placeholder}
-                    value={formData[field.name as keyof UserFormData]}
-                    onChange={handleChange}
-                    error={errors[field.name as keyof ErrorsType]}
-                />
-                ))}
-                <span className={styles.validation}>{submitError}</span>
-                <button type="submit" className={styles.loginFormButtons} id="userLoginButton" onClick={registerUser}>Register</button>
-            </form>
-        </div>
+
+        <Layout>
+            <div>
+                <form className={styles.userForm} onSubmit={registerUser}>
+                    <h1>Personal and Account Information</h1>
+                    {formFields.map(field => (
+                        <InputField 
+                            key={field.id}
+                            label={field.label}
+                            type={field.type}
+                            id={field.id}
+                            name={field.name}
+                            placeholder={field.placeholder}
+                            value={formData[field.name as keyof UserFormData]}
+                            onChange={handleChange}
+                            error={errors[field.name as keyof ErrorsType]}
+                        />
+                    ))}
+                    <span className={styles.validation}>{submitError}</span>
+                    <button type="submit" className={styles.loginFormButtons} id="userLoginButton" onClick={registerUser}>Register</button>
+                </form>
+            </div>
+        </Layout>
     );
 }
