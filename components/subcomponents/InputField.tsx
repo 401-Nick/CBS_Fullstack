@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../styles/inputField.module.css';
+import FontStyles from '../../styles/FormStyles.module.css';
 
 // TypeScript Interface for InputField component props
 interface InputFieldProps {
@@ -25,7 +25,7 @@ const InputField: React.FC<InputFieldProps> = ({
     error}) => {
     
     return (
-        <div className={styles.buttonContainer}>
+        <div className={FontStyles.buttonContainer}>
             <label htmlFor={id}>{label}</label>
             <input
                 type={type}
@@ -35,7 +35,7 @@ const InputField: React.FC<InputFieldProps> = ({
                 value={value}
                 onChange={onChange}
             />
-            {error && <div className={styles.validation}>{error}</div>}
+            {error && <div className={FontStyles.validation}>{error}</div>}
         </div>
     );
 };
