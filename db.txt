@@ -1,0 +1,38 @@
+Tables and Fields
+
+Users
+    UserID (Primary Key, Auto Increment)
+    FirstName
+    LastName
+    BirthDate
+    SSN (hashed and encrypted)
+    EmailAddress
+    MobileNumber
+    PhysicalAddress
+    Password (hashed)
+
+Accounts
+    AccountID (Primary Key, Auto Increment)
+    UserID (Foreign Key)
+    AccountType (e.g., Savings, Checking)
+    Balance
+    CreatedAt
+    UpdatedAt
+
+Transactions
+    TransactionID (Primary Key, Auto Increment)
+    AccountID (Foreign Key)
+    Amount
+    TransactionType (e.g., Deposit, Withdrawal)
+    Timestamp
+
+Settings
+    SettingsID (Primary Key, Auto Increment)
+    UserID (Foreign Key)
+    Theme
+    NotificationsEnabled
+
+Layouts
+    LayoutID (Primary Key, Auto Increment)
+    UserID (Foreign Key)
+    LayoutConfig (could be a JSON or string to represent layout settings)

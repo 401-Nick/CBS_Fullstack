@@ -1,54 +1,64 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import executeQuery from '../../../utils/query';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Database Query
+const getHashedPasswordFromDB = async (emailAddress: string) => {
+  const query = 'SELECT Password FROM users WHERE EmailAddress = ?';
+  return await executeQuery(query, [emailAddress]);
+};
+
+// JWT Token Generation
+const generateToken = (userId: string, secretKey: string) => {
+  try {
+    return jwt.sign({ userId }, secretKey, { expiresIn: '1h' });
+  } catch (error) {
+    throw new Error("Error generating token");
+  }
+};
 
 const loginHandler = async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log('Entered loginHandler');
-
+  console.log('Request method:', req.method);
   if (req.method === 'POST') {
-    console.log('Processing POST request');
-    
     const { emailAddress, password } = req.body;
-    console.log(`Received email: ${emailAddress} and password: ${password}`);
+
+    if (!emailAddress || !password || typeof emailAddress !== 'string' || typeof password !== 'string') {
+      console.log('Invalid email address or password format');
+      return res.status(400).json({ message: 'Invalid email address or password format' });
+    }
 
     try {
-      // Retrieve hashed password from database
-      const query = 'SELECT password FROM user_information WHERE emailAddress = ?';
-      console.log(`Executing SQL query: ${query}`);
-      
-      const result = await executeQuery(query, [emailAddress]);
+      const result = await getHashedPasswordFromDB(emailAddress);
 
-      console.log('SQL Query executed');
-      console.log(`SQL Result: ${JSON.stringify(result)}`);
-
-      if (result.length === 0) {
-        console.log('No records found in database');
-        res.status(401).json({ message: 'Invalid email or password' });
-        return;
+      if (result.length === 0 || !result[0].Password) {
+        return res.status(401).json({ message: 'Invalid email or password' });
       }
 
-      const hashedPassword = result[0].password;
-      console.log(`Hashed password from DB: ${hashedPassword}`);
+      const hashedPassword = result[0].Password.toString('utf-8');
 
-      // Use bcrypt to compare provided password to hashed password
-      console.log('Comparing passwords using bcrypt');
+      if (typeof hashedPassword !== 'string' || typeof password !== 'string') {
+        return res.status(500).json({ message: 'Internal Server Error' });
+      }
       const match = await bcrypt.compare(password, hashedPassword);
+      const secretKey = process.env.JWT_SECRET_KEY || "";
 
-      if (match) {
-        console.log('Passwords match');
-        res.status(200).json({ message: 'Login successful' });
+      if (match && secretKey) {
+        const token = generateToken(emailAddress, secretKey);
+        return res.status(200).json({ message: 'Login successful', data: token });
       } else {
-        console.log('Passwords do not match');
-        res.status(401).json({ message: 'Invalid email or password' });
+        return res.status(401).json({ message: 'Invalid email or password' });
       }
-
     } catch (error: any) {
-      console.error(`Caught exception: ${error.message}`);
-      res.status(500).json({ message: `An error occurred: ${error.message}` });
+      if (error.message === "Error generating token") {
+        return res.status(500).json({ message: error.message });
+      }
+      return res.status(500).json({ message: error.message });
     }
   } else {
-    console.log('Request is not POST');
-    res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 };
 

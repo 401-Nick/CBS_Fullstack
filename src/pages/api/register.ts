@@ -1,59 +1,58 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import executeQuery from '../../../utils/query';
 import bcrypt from 'bcrypt';
+import { encrypt } from '../../../utils/cryptoUtils';
+
+// Validation Function
+const validateInputs = (body: any) => {
+    // Add more validations here
+    return /\S+@\S+\.\S+/.test(body.emailAddress) && body.ssn.length === 11 && body.mobileNumber.length >= 10;
+};
+
+// Password Hashing Function
+const hashPassword = async (password: string) => {
+    const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS || "10"));
+    return await bcrypt.hash(password, salt);
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    console.log('Request method:', req.method);
+    console.log('Request body:', req.body);
+
     if (req.method === 'POST') {
-        const {
-            firstName,
-            lastName,
-            dob,
-            ssn,
-            emailAddress,
-            mobileNumber,
-            physicalAddress,
-            password,
-        } = req.body;
+        const { firstName, lastName, dob, ssn, emailAddress, mobileNumber, physicalAddress, password } = req.body;
 
-        // Input Validation
-        if (!firstName || !lastName || !dob || !ssn || !emailAddress || !mobileNumber || !physicalAddress) 
-            {return res.status(400).json({ error: 'All fields are required' });}
+        if (!validateInputs(req.body)) {
+            console.log('Invalid inputs:', req.body);
+            return res.status(400).json({ error: 'Invalid inputs' });
+        }
 
-        if (!/\S+@\S+\.\S+/.test(emailAddress)) 
-            {return res.status(400).json({ error: 'Valid email is required' });}
-
-        if (ssn.length !== 11)                  
-            {return res.status(400).json({ error: 'Valid SSN is required. 000-00-0000' });}
-
-        if (mobileNumber.length < 10)           
-            {return res.status(400).json({ error: 'Valid mobile number is required' });}
-
-        // Password Hashing
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-
-        // SQL Query to Insert Data
-        //Not unique values: firstName, lastName, birthDate, physicalAddress, password, mobileNumber
-        //Unique values: emailAddress, ssn
-        
-        //Im wary of mobileNumber not being unique but I'm watching my use of it. If it proves to be problem I'll change it to unique.
-        //Depends how 2FA is handled. 
-
-        const sql = 'INSERT INTO user_information (firstName, lastName, birthDate, ssn, emailAddress, mobileNumber, physicalAddress, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        const values = [firstName, lastName, dob, ssn, emailAddress, mobileNumber, physicalAddress, hashedPassword];
-        
         try {
+            const hashedPassword = await hashPassword(password);
+            console.log('Hashed password:', hashedPassword);
+
+            const encryptedSSN = await encrypt(ssn);
+            console.log('Encrypted SSN:', encryptedSSN);
+
+            const hashedSSN = await hashPassword(encryptedSSN);
+            console.log('Hashed SSN:', hashedSSN);
+
+            const sql = 'INSERT INTO users (FirstName, LastName, BirthDate, _a_ssn_, EmailAddress, MobileNumber, PhysicalAddress, Password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            const values = [firstName, lastName, dob, hashedSSN, emailAddress, mobileNumber, physicalAddress, hashedPassword];
+
+            console.log('SQL query:', sql);
+            console.log('SQL values:', values);
+
             await executeQuery(sql, values);
-            res.status(201).json({ success: true, message: ' ' });
+            console.log('User created');
+
+            res.status(201).json({ success: true, message: 'User created' });
         } catch (error: any) {
-            //  Removed 409 to prevent against user numeration. Could be mitigated by IP banning/limiting however with auto IP rotation--
-            //--a user could fuzz all the inputs looking for non 409 errors and then guess important unique fields like ssn. For that reason, the error code needs to be generic.
-            /////////////////////////////////If you want Duplicate Entry errors to be verbose, uncomment the below code and comment out the line below it./////////////////////////////////////
-            // if (error.code === 'ER_DUP_ENTRY') {res.status(409).json({ error: 'Registration failed due to duplicate information' });} else { res.status(500).json({ error: error.message });
+            console.log('Error:', error.message);
             res.status(500).json({ error: error.message });
         }
     } else {
+        console.log('Method not allowed');
         res.status(405).json({ error: 'Method not allowed' });
     }
 }

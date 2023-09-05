@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import FontStyles from '../../styles/FormStyles.module.css';
 
 // TypeScript Interface for InputField component props
@@ -13,7 +13,7 @@ interface InputFieldProps {
     error?: string | null;
 }
 
-// InputField Component
+    // InputField Component
 const InputField: React.FC<InputFieldProps> = ({
     label,
     type,
@@ -22,20 +22,20 @@ const InputField: React.FC<InputFieldProps> = ({
     placeholder,
     value,
     onChange,
-    error}) => {
-    
+    error,
+}) => {
     return (
         <div className={FontStyles.buttonContainer}>
-            <label htmlFor={id}>{label}</label>
-            <input
-                type={type}
-                id={id}
-                name={name}
-                placeholder={placeholder}
-                value={value}
-                onChange={onChange}
-            />
-            {error && <div className={FontStyles.validation}>{error}</div>}
+        <label htmlFor={id}>{label}</label>
+        <input
+            type={type}
+            id={id}
+            name={name}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+        />
+        <div className={FontStyles.validation}>{error}</div>
         </div>
     );
 };

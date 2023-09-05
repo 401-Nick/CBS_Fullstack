@@ -1,0 +1,21 @@
+.layoutContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+    width: 100%;
+    height: 100vh !important;
+    margin: 0;
+}
+
+.footerContainer {
+    background-color: #ed1d24;
+    border-top: 1px solid #ddd;
+    padding: 20px 0;
+    text-align: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+}
